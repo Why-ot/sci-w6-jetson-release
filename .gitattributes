@@ -1,0 +1,3 @@
+# Byte-exact distribution: no line-ending conversion, no text normalisation.
+# Without this, git would store LF and check out CRLF on Windows, changing every SHA256.
+* -text

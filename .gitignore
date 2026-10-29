@@ -1,0 +1,50 @@
+# ---- credentials / secrets: never commit ----
+*.pem
+*.key
+*.ppk
+id_rsa*
+id_ed25519*
+known_hosts
+.ssh/
+.netrc
+.git-credentials
+*.token
+.env
+.env.*
+secrets*
+
+# ---- real sensor data / captures ----
+*.raw
+*.bag
+*.db3
+*.mcap
+capture*/
+real_frames*/
+S40_SESSION_*/
+placement_*/
+
+# ---- model weights / large binaries ----
+*.tar
+*.ckpt
+*.pt
+*.pth
+*.onnx
+checkpoints/
+datasets/
+
+# ---- python ----
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+.pytest_cache/
+
+# ---- OS / editor ----
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# ---- explicit allow: the audited distribution tarball ----
+!package/W6_TRANSFER_PACKAGE.tar.gz
