@@ -1,0 +1,151 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "S40 real capture metadata schema",
+  "version": "1.0",
+  "description": "Metadata contract for one placement of one target. Values marked read_from_device must be obtained from the camera at run time; values marked operator must be entered by a human. Nothing here may be filled from project documentation.",
+  "type": "object",
+  "required": ["target_id", "placement_id", "captured_at", "device", "streams", "files"],
+  "properties": {
+    "target_id": {"enum": ["S00", "S20", "S40A", "S40B", "S60"]},
+    "placement_id": {"type": "integer", "minimum": 1, "maximum": 5},
+    "captured_at": {"type": "string", "description": "ISO-8601 with offset"},
+    "operator": {"type": "string"},
+    "device": {
+      "type": "object",
+      "required": ["serial", "depth_scale_m_per_unit", "source"],
+      "properties": {
+        "serial": {"type": "string", "description": "read_from_device"},
+        "product_line": {"type": "string", "description": "read_from_device"},
+        "firmware_version": {"type": "string", "description": "read_from_device"},
+        "depth_scale_m_per_unit": {"type": "number", "exclusiveMinimum": 0, "maximum": 0.1,
+                                   "description": "read_from_device via rs2_get_depth_scale()"},
+        "source": {"type": "string", "const": "rs2_get_depth_scale() at run time"},
+        "emitter_enabled": {"type": ["number", "null"], "description": "read_from_device"},
+        "exposure_us": {"type": ["number", "null"], "description": "read_from_device"},
+        "gain": {"type": ["number", "null"], "description": "read_from_device"},
+        "laser_power": {"type": ["number", "null"], "description": "read_from_device"}
+      }
+    },
+    "streams": {
+      "type": "object",
+      "required": ["depth", "color"],
+      "properties": {
+        "depth": {
+          "type": "object",
+          "required": ["width", "height", "format", "fps", "fx", "fy", "cx", "cy"],
+          "properties": {
+            "width": {"const": 848}, "height": {"const": 480},
+            "format": {"const": "Z16"}, "fps": {"const": 30},
+            "fx": {"type": "number", "exclusiveMinimum": 0, "description": "read_from_device"},
+            "fy": {"type": "number", "exclusiveMinimum": 0, "description": "read_from_device"},
+            "cx": {"type": "number", "description": "read_from_device"},
+            "cy": {"type": "number", "description": "read_from_device"},
+            "model": {"type": "string", "description": "read_from_device"},
+            "coeffs": {"type": "array", "items": {"type": "number"}}
+          }
+        },
+        "color": {
+          "type": "object",
+          "required": ["width", "height", "format", "fps"],
+          "properties": {
+            "width": {"const": 640}, "height": {"const": 480},
+            "format": {"const": "RGB8"}, "fps": {"const": 30},
+            "fx": {"type": ["number", "null"]}, "fy": {"type": ["number", "null"]},
+            "cx": {"type": ["number", "null"]}, "cy": {"type": ["number", "null"]}
+          }
+        }
+      }
+    },
+    "files": {
+      "type": "array",
+      "minItems": 30,
+      "maxItems": 30,
+      "items": {
+        "type": "object",
+        "required": ["frame", "depth", "depth_sha256", "depth_bytes", "color", "color_sha256"],
+        "properties": {
+          "frame": {"type": "integer", "minimum": 0, "maximum": 29},
+          "depth": {"type": "string", "pattern": "^frame_[0-9]{3}\\.raw$"},
+          "depth_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+          "depth_bytes": {"const": 814080},
+          "color": {"type": "string", "pattern": "^frame_[0-9]{3}\\.png$"},
+          "color_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+          "color_bytes": {"type": "integer", "minimum": 1000},
+          "valid_ratio": {"type": "number", "minimum": 0, "maximum": 1}
+        }
+      }
+    },
+    "timestamps": {
+      "type": "array",
+      "minItems": 30,
+      "items": {
+        "type": "object",
+        "required": ["frame_index", "device_timestamp_ms", "host_timestamp_iso"],
+        "properties": {
+          "frame_index": {"type": "integer"},
+          "device_timestamp_ms": {"type": "number", "description": "strictly increasing"},
+          "host_timestamp_iso": {"type": "string"}
+        }
+      }
+    },
+    "roi": {
+      "type": "object",
+      "required": ["regions", "_payload_sha256"],
+      "description": "Frozen before any metric. A file cannot carry its own hash, so the frozen hash covers the canonical JSON of regions only.",
+      "properties": {
+        "regions": {
+          "type": "array",
+          "minItems": 2,
+          "items": {
+            "type": "object",
+            "required": ["name", "polygon", "physical_face"],
+            "properties": {
+              "name": {"enum": ["FRONT_PLANE_ROI", "BACK_PLANE_ROI", "PLANE_ROI"]},
+              "polygon": {"type": "array", "minItems": 3,
+                          "items": {"type": "array", "items": {"type": "number"}, "minItems": 2, "maxItems": 2}},
+              "physical_face": {"type": "string",
+                                "description": "operator: which physical face of the target this region is, e.g. 'near face, 40 mm proud'"}
+            }
+          }
+        },
+        "_payload_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+      }
+    },
+    "placement_metadata": {
+      "type": "object",
+      "required": ["nominal_distance_m", "temperature_C", "illumination", "emitter_on"],
+      "description": "operator: environment record",
+      "properties": {
+        "nominal_distance_m": {"type": "number"},
+        "nominal_distance_source": {"type": "string", "description": "tape/rule, not the D435"},
+        "target_tilt_deg": {"type": ["number", "null"]},
+        "near_face": {"type": ["string", "null"]},
+        "lateral_offset_mm": {"type": ["number", "null"]},
+        "temperature_C": {"type": "number"},
+        "illumination": {"type": "string"},
+        "emitter_on": {"type": "boolean"},
+        "valid_ratio_preview": {"type": ["number", "null"], "minimum": 0, "maximum": 1},
+        "notes": {"type": "string"}
+      }
+    },
+    "reference": {
+      "type": "object",
+      "description": "Independent instrument readings. A D435 value is never a reference.",
+      "required": ["instrument_model", "instrument_resolution_mm", "readings_mm"],
+      "properties": {
+        "instrument_model": {"type": "string", "minLength": 1},
+        "instrument_resolution_mm": {"type": "number", "exclusiveMinimum": 0},
+        "instrument_repeatability_mm": {"type": ["number", "null"]},
+        "measurement_location": {"type": "string"},
+        "readings_mm": {"type": "array", "minItems": 3, "items": {"type": "number", "exclusiveMinimum": 0}},
+        "reference_u95_mm": {"type": ["number", "string"], "description": "'UNKNOWN' until a full budget exists"}
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": {"properties": {"target_id": {"const": "S00"}}},
+      "then": {"properties": {"reference": {"description": "S00 uses a plane protocol, not a step measurement"}}}
+    }
+  ]
+}

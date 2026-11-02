@@ -1,0 +1,114 @@
+[
+  {
+    "test": "valid session -> COMPLETE",
+    "pass": true,
+    "got": "COMPLETE",
+    "want": "COMPLETE",
+    "detail": ""
+  },
+  {
+    "test": "no reference -> CAPTURE_OK_REFERENCE_MISSING",
+    "pass": true,
+    "got": "CAPTURE_OK_REFERENCE_MISSING",
+    "want": "CAPTURE_OK_REFERENCE_MISSING",
+    "detail": ""
+  },
+  {
+    "test": "short depth file -> INCOMPLETE",
+    "pass": true,
+    "got": "INCOMPLETE",
+    "want": "INCOMPLETE",
+    "detail": ""
+  },
+  {
+    "test": "missing intrinsics -> INCOMPLETE",
+    "pass": true,
+    "got": "INCOMPLETE",
+    "want": "INCOMPLETE",
+    "detail": ""
+  },
+  {
+    "test": "wrong intrinsics resolution -> INCOMPLETE",
+    "pass": true,
+    "got": "INCOMPLETE",
+    "want": "INCOMPLETE",
+    "detail": ""
+  },
+  {
+    "test": "decreasing timestamps -> INCOMPLETE",
+    "pass": true,
+    "got": "INCOMPLETE",
+    "want": "INCOMPLETE",
+    "detail": ""
+  },
+  {
+    "test": "extra duplicate file -> INCOMPLETE",
+    "pass": true,
+    "got": "INCOMPLETE",
+    "want": "INCOMPLETE",
+    "detail": ""
+  },
+  {
+    "test": "truncated raw colour -> INCOMPLETE",
+    "pass": true,
+    "got": "INCOMPLETE",
+    "want": "INCOMPLETE",
+    "detail": ""
+  },
+  {
+    "test": "implausible depth_scale -> INCOMPLETE",
+    "pass": true,
+    "got": "INCOMPLETE",
+    "want": "INCOMPLETE",
+    "detail": ""
+  },
+  {
+    "test": "all-zero depth detected",
+    "pass": true,
+    "got": "False",
+    "want": "False",
+    "detail": "['no valid depth pixels', 'only 1 distinct depth values (constant or corrupt?)']"
+  },
+  {
+    "test": "3D back-projection executes",
+    "pass": true,
+    "got": "True",
+    "want": "True",
+    "detail": "365920 points, z=[0.001,2.999] m"
+  },
+  {
+    "test": "missing session -> NOT_FOUND",
+    "pass": true,
+    "got": "NOT_FOUND",
+    "want": "NOT_FOUND",
+    "detail": ""
+  },
+  {
+    "test": "CLI exit 0 on valid session",
+    "pass": true,
+    "got": "0",
+    "want": "0",
+    "detail": ""
+  },
+  {
+    "test": "CLI exit 3 when reference missing",
+    "pass": true,
+    "got": "3",
+    "want": "3",
+    "detail": ""
+  },
+  {
+    "test": "CLI exit 2 on NOT_FOUND",
+    "pass": true,
+    "got": "2",
+    "want": "2",
+    "detail": ""
+  },
+  {
+    "test": "capture refuses without confirmation",
+    "pass": true,
+    "got": "2",
+    "want": "2",
+    "detail": ""
+  }
+]
